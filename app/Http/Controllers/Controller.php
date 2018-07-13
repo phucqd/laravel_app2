@@ -12,6 +12,11 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public function index() {
-        return 1;
+        $arr = [
+            'key1' => 1,
+            'key2' => 2
+        ];
+
+        return $arr;
     }
 }
