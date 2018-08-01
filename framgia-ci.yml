@@ -2,10 +2,11 @@ build:
   phpunit:
     image: daothaison/civ3-workspace:latest
     commands:
-    - cp .env.test .env
+    - cp .env.civ3.example .env
     - php artisan config:clear
     - composer install
-    - framgia-ci test-connect civ3.framgia.vn 443
+    - framgia-ci test-connect mysql_test 3306 60
+    - php artisan migrate --database=mysql_test
     - framgia-ci run
 services:
   mysql:
@@ -22,11 +23,26 @@ services:
       MYSQL_USER: homestead_test
       MYSQL_PASSWORD: secret
       MYSQL_ROOT_PASSWORD: root
+#plugin:
+  #chatwork:
+    #image: dangminhtruong/drone-chatwork:latest
+    # token: $$token
+    # room_id: $$room_id
+    # message: CI_TEAM!
+    # status: SUCCESS
+  # slack:
+  #   image: plugins/slack
+  #   webhook: https://hooks.slack.com/services/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
+  #   channel: general
 cache:
-  mount:
-    - .git
-    - vendor
-    - node_modules
+  git:
+    folder: .git
+  composer:
+    folder: vendor
+    file: composer.lock
+  nodejs:
+    folder: node_modules
+    file: yarn.lock
 deploy:
   docker:
     username: octocat
@@ -35,11 +51,6 @@ deploy:
     repo: dangminhtruong/Havana_Laravel
 project_type: php
 test:
-  eslint:
-    ignore: false
-    command: eslint --format=checkstyle
-      --output-file=.framgia-ci-reports/eslint.xml
-      resources/assets/js/ --ext .js
   phpcpd:
     ignore: true
     command: phpcpd --log-pmd=.framgia-ci-reports/phpcpd.xml app
