@@ -1,55 +1,28 @@
-build:
-  phpunit:
-    image: daothaison/civ3-workspace:latest
-    commands:
-    - cp .env.civ3.example .env
-    - php artisan config:clear
-    - composer install
-    - framgia-ci test-connect mysql_test 3306 60
-    - php artisan migrate --database=mysql_test
-    - framgia-ci run
-services:
-  mysql:
-    image: mysql:5.7
-    environment:
-      MYSQL_DATABASE: homestead
-      MYSQL_USER: homestead
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: root
-  mysql_test:
-    image: mysql:5.7
-    environment:
-      MYSQL_DATABASE: homestead_test
-      MYSQL_USER: homestead_test
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: root
-#plugin:
-  #chatwork:
-    #image: dangminhtruong/drone-chatwork:latest
-    # token: $$token
-    # room_id: $$room_id
-    # message: CI_TEAM!
-    # status: SUCCESS
-  # slack:
-  #   image: plugins/slack
-  #   webhook: https://hooks.slack.com/services/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
-  #   channel: general
-cache:
-  git:
-    folder: .git
-  composer:
-    folder: vendor
-    file: composer.lock
-  nodejs:
-    folder: node_modules
-    file: yarn.lock
-deploy:
-  docker:
-    username: octocat
-    password: password
-    email: dangminhtruong@gmail.com
-    repo: dangminhtruong/Havana_Laravel
 project_type: php
+build:
+  general_test:
+    image: framgiaciteam/laravel-workspace:latest
+    services:
+      mysql:
+        image: mysql:5.7
+        environment:
+          MYSQL_DATABASE: laravel_app
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: root
+      mysql_test:
+        image: mysql:5.7
+        environment:
+          MYSQL_DATABASE: laravel_app
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: root
+    prepare:
+      - cp .env.test .env
+      - php artisan config:clear
+      - composer install
+      - framgia-ci test-connect mysql 3306 5
+      - php artisan migrate --database=laravel_app
 test:
   phpcpd:
     ignore: true
@@ -68,12 +41,22 @@ test:
     command: phpmetrics --report-html=.framgia-ci-reports/metrics.html
       --report-xml=.framgia-ci-reports/metrics.xml
       app
-  phpcs:
-    ignore: false
-    command: echo '' | phpcs --standard=Framgia --report-checkstyle=.framgia-ci-reports/phpcs.xml --ignore=app/Supports/* app
   phpunit:
     ignore: false
     command:
       - php -dzend_extension=xdebug.so vendor/bin/phpunit
         --coverage-clover=.framgia-ci-reports/coverage-clover.xml
         --coverage-html=.framgia-ci-reports/coverage
+deploy:
+  rocketeer:
+    image: fdplugins/ssh-php:php5
+    when:
+      branch: master
+    commands:
+      - php rocketeer.phar deploy --on=staging --no-interaction
+cache:
+  git:
+    folder: .git
+  composer:
+    folder: vendor
+    file: composer.lock
