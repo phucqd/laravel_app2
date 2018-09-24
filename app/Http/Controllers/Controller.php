@@ -14,9 +14,12 @@ class Controller extends BaseController
     public function index() {
         $arr = [
             'key1' => 1,
-            'key2' => 2
+            'key2' => 2,
         ];
 
+        $str = 'This is too long string and expected 120 character' . ' and many variable declared but not use'. ' And missing space in string ....';
+        $arr['str'] = $str;
+        
         return $arr;
     }
 }
