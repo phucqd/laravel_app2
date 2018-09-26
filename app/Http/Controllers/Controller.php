@@ -21,5 +21,6 @@ class Controller extends BaseController
         $arr['str'] = $strs;
 
         return $arr;
+
     }
 }
