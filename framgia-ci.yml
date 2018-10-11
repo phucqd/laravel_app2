@@ -21,7 +21,6 @@ build:
       - cp .env.test .env
       - php artisan config:clear
       - composer install
-      - framgia-ci test-connect mysql 3306 5
       - php artisan migrate --database=laravel_app
 test:
   phpcpd:
