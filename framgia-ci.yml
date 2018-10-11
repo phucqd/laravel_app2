@@ -39,12 +39,6 @@ test:
       - php -dzend_extension=xdebug.so vendor/bin/phpunit
         --coverage-clover=.framgia-ci-reports/coverage-clover.xml
         --coverage-html=.framgia-ci-reports/coverage
-deploy:
-  rocketeer:
-    image: framgiaciteam/deployer:2.0
-    when:
-      branch: master
-    run: php rocketeer.phar deploy --on=testing --no-interaction
 cache:
   git:
     folder: .git
