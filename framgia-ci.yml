@@ -10,13 +10,6 @@ build:
           MYSQL_USER: root
           MYSQL_PASSWORD: root
           MYSQL_ROOT_PASSWORD: root
-      mysql_test:
-        image: mysql:5.7
-        environment:
-          MYSQL_DATABASE: laravel_app
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
-          MYSQL_ROOT_PASSWORD: root
     prepare:
       - cp .env.test .env
       - php artisan config:clear
@@ -48,11 +41,10 @@ test:
         --coverage-html=.framgia-ci-reports/coverage
 deploy:
   rocketeer:
-    image: fdplugins/ssh-php:php5
+    image: framgiaciteam/deployer:2.0
     when:
       branch: master
-    commands:
-      - php rocketeer.phar deploy --on=staging --no-interaction
+    run: php rocketeer.phar deploy --on=testing --no-interaction
 cache:
   git:
     folder: .git
